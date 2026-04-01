@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BioFuel Trainer CRM</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>📅 Trainer CRM</h1>
+
+    <!-- WEEK -->
+    <div class="week">
+        {% for d in week %}
+            <a class="day {% if d == date %}active{% endif %}" href="/?date={{ d }}">
+                {{ d }}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- ADD FORM -->
+    <div class="card">
+        <h2>➕ Добавить тренировку</h2>
+
+        <form method="POST" action="/add">
+            <input type="hidden" name="date" value="{{ date }}">
+
+            <input name="name" placeholder="Имя клиента" required>
+
+            <select name="workout">
+                <option>Ноги</option>
+                <option>Руки</option>
+                <option>Грудь</option>
+                <option>Спина</option>
+                <option>Плечи</option>
+                <option>Фулбади</option>
+            </select>
+
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="card">
+        <h2>👥 Клиенты</h2>
+
+        {% for c in clients %}
+        <div class="client-box">
+
+            <h3>👤 {{ c.name }}</h3>
+
+            {% if c.history|length == 0 %}
+                <p class="empty">Нет тренировок</p>
+            {% endif %}
+
+            {% for h in c.history %}
+            <div class="client {% if h.done %}done{% endif %}">
+                <div>
+                    <b>{{ h.workout }}</b>
+                    <small>({{ h.time }})</small>
+                </div>
+
+                {% if not h.done %}
+                <form method="POST" action="/done">
+                    <input type="hidden" name="date" value="{{ date }}">
+                    <input type="hidden" name="name" value="{{ c.name }}">
+                    <input type="hidden" name="index" value="{{ loop.index0 }}">
+                    <button>✔</button>
+                </form>
+                {% else %}
+                    ✔
+                {% endif %}
+            </div>
+            {% endfor %}
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+</body>
+</html>

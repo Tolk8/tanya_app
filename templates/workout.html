@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ workout.name }}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<h1 style="color:red;">TEST STYLE CHECK</h1>
+
+<h1>{{ workout.name }}</h1>
+
+<p>{{ workout.desc }}</p>
+
+<div class="card">
+
+    <h2>Упражнения</h2>
+
+    <div class="exercise">
+        <label>
+            <input type="checkbox" class="check-exercise">
+            Жим лёжа
+        </label>
+    </div>
+
+    <div class="exercise">
+        <label>
+            <input type="checkbox" class="check-exercise">
+            Приседания
+        </label>
+    </div>
+
+    <div class="exercise">
+        <label>
+            <input type="checkbox" class="check-exercise">
+            Тяга штанги
+        </label>
+    </div>
+
+    <button onclick="alert('Тренировка завершена!')">
+        Завершить тренировку
+    </button>
+
+</div>
+
+<a href="/" class="back">
+    <button>Назад</button>
+</a>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const workoutName = "{{ workout.name }}";
+    const checkboxes = document.querySelectorAll(".check-exercise");
+
+    checkboxes.forEach((cb, index) => {
+
+        const key = workoutName + "_exercise_" + index;
+
+        const saved = localStorage.getItem(key);
+        if (saved === "true") {
+            cb.checked = true;
+        }
+
+        cb.addEventListener("change", function () {
+            localStorage.setItem(key, cb.checked);
+        });
+
+    });
+
+});
+</script>
+
+</body>
+</html>

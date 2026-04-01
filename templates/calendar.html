@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Календарь тренировок</title>
+</head>
+
+<body>
+
+<h1>📅 Календарь тренировок</h1>
+
+<a href="/">Назад</a>
+
+{% for date, clients in schedule.items() %}
+
+    <h2>{{ date }}</h2>
+
+    {% for client in clients %}
+        <p>👤 {{ client.name }} — 💪 {{ client.workout }}</p>
+    {% endfor %}
+
+    <hr>
+
+{% endfor %}
+
+</body>
+</html>
