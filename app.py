@@ -8,6 +8,7 @@ app = Flask(__name__)
 DATA_FILE = "data.json"
 
 
+# 📥 загрузка данных
 def load_data():
     if os.path.exists(DATA_FILE):
         with open(DATA_FILE, "r", encoding="utf-8") as f:
@@ -15,7 +16,8 @@ def load_data():
     return {}
 
 
-def save_data(data):
+# 💾 сохранение данных
+def save_data():
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
@@ -23,6 +25,7 @@ def save_data(data):
 data = load_data()
 
 
+# 🏠 главная страница
 @app.route("/")
 def index():
     date = request.args.get("date")
@@ -34,15 +37,18 @@ def index():
 
     today = datetime.today()
     start = today - timedelta(days=today.weekday())
-    week = [(start + timedelta(days=i)).strftime("%Y-%m-%d") for i in range(7)]
+
+    week = []
+    for i in range(7):
+        day = start + timedelta(days=i)
+        week.append(day.strftime("%Y-%m-%d"))
 
     return render_template("index.html", date=date, clients=clients, week=week)
 
 
+# ➕ добавление клиента
 @app.route("/add", methods=["POST"])
 def add():
-    global data
-
     date = request.form["date"]
     name = request.form["name"]
     workout = request.form["workout"]
@@ -50,46 +56,30 @@ def add():
     if date not in data:
         data[date] = []
 
-    # ищем клиента
-    client = None
-    for c in data[date]:
-        if c["name"] == name:
-            client = c
-            break
-
-    if not client:
-        client = {
-            "name": name,
-            "history": []
-        }
-        data[date].append(client)
-
-    client["history"].append({
+    data[date].append({
+        "name": name,
         "workout": workout,
-        "time": datetime.now().strftime("%H:%M"),
         "done": False
     })
 
-    save_data(data)
+    save_data()
     return redirect(url_for("index", date=date))
 
 
+# ✅ отметить выполнено
 @app.route("/done", methods=["POST"])
 def done():
-    global data
-
     date = request.form["date"]
-    name = request.form["name"]
     index = int(request.form["index"])
 
-    for c in data.get(date, []):
-        if c["name"] == name:
-            if 0 <= index < len(c["history"]):
-                c["history"][index]["done"] = True
+    if date in data and 0 <= index < len(data[date]):
+        data[date][index]["done"] = True
 
-    save_data(data)
+    save_data()
     return redirect(url_for("index", date=date))
 
 
+# 🚀 запуск (ВАЖНО ДЛЯ RENDER)
 if __name__ == "__main__":
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
